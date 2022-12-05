@@ -139,7 +139,7 @@ class Competencies:
         self.comp_id = (comp_id,)
         self.comp_name = (comp_name,)
         self.date_created = date_created
-        pass
+        return
 
 
 class Assessment_Results:
@@ -158,7 +158,7 @@ class Assessment_Results:
         assr.date_taken = (date_taken,)
         assr.manager = (manager,)
         assr.ass_id = ass_id
-        pass
+        return
 
 
 class Assessment_Data:
@@ -166,41 +166,86 @@ class Assessment_Data:
         assd.ass_id = (ass_id,)
         assd.comp_id = (comp_id,)
         assd.date_created = (date_created,)
-        pass
+        return
 
 
-view = cursor.execute("SELECT * FROM Users").fetchall()
-print(view)
-# def view_comp_and_ass_data():
-#     view = cursor.execute(
-#         """SELECT (Competencies.*, Assessment_Data.(ass_id, date_created)) FROM Competencies
-#                           JOIN Assessment_Data
-#                           ON Competencies.comp_id = Assessment_Data.comp_id;"""
-#     )
-#     result = cursor.execute(view).fetchall()
-#     headers = [
-#         "Comp ID",
-#         "Comp Name",
-#         "Date Competency Created",
-#         "Assessment_ID",
-#         "Date Assessment Created"
-#         # "Result ID",
-#         # "User ID",
-#         # "Score",
-#         # "Date Taken",
-#         # "Manager",
-#     ]
-#     print(
-#         #    comp id        comp name      date created     result id       user id         score           date taken      manager
-#         f"{headers[0]:<11}{headers[1]:>13}{headers[2]:>14}{headers[3]:>18}{headers[4]:>14}{headers[5]:>14}{headers[6]:>14}{headers[7]:>10}"
-#     )
-#     print(
-#         f'{"---------":<11}{"-----------":>13}{"----------":>14}{"-------------":>18}{"-----------":>14}{"---------------":>14}{"---------------":>10}'
-#     )
-#     for row in result:
-#         row = [str(i) for i in row]
-#         print(
-#             f"{row[0]:<11}{row[1]:>13}{row[2]:>14}{row[3]:>18}{row[4]:>14}{row[5]:>14}{row[6]:>14}{row[7]:>10}"
-#         )
+def view_comp_and_ass_data():
+    view = cursor.execute(
+        """SELECT (Competencies.comp_name, Assessment_Results.(ass_id, score, date_taken, manager) FROM Competencies
+                          JOIN Assessment_Data
+                          ON Competencies.comp_id = Assessment_Data.comp_id
+                          JOIN Assessment_results
+                          ON Assessment_Data.ass_id = Assessmrnt_Results.ass_id;"""
+    )
+    result = cursor.execute(view).fetchall()
+    headers = [
+        "Comp Name",
+        "Assessment_ID",
+        "User ID",
+        "Score",
+        "Date Taken",
+        "Manager",
+    ]
+    print(
+        #    comp name      assessment id     user id         score         date taken      manager
+        f"{headers[0]:<11}{headers[1]:>5}{headers[2]:>5}{headers[3]:>5}{headers[4]:>10}{headers[5]:>14}"
+    )
+    print(
+        f'{"---------":<11}{"------------":>5}{"----------":>5}{"-------------":>5}{"-----------":>10}{"---------------":>14}'
+    )
+    for row in result:
+        row = [str(i) for i in row]
+        print(
+            f"{row[0]:<11}{row[1]:>5}{row[2]:>8}{row[3]:>5}{row[4]:>10}{row[5]:>14}"
+        )
 
-#     return
+    return
+# change name/edit password
+
+def add(user):
+    query = """INSERT INTO Users (first_name, phone, email, password, active, date_created, hire_date, user_type) 
+               VALUES (?,?,?,?,?,?,?,?)"""
+    cursor.execute(
+        query,
+        (
+            user.first_name,
+            user.last_name,           
+            user.phone,
+            user.email,
+            user.password,
+            user.active,
+            user.date_created,
+            user.hire_date,
+            user.user_type
+        )
+    )
+    connection.commit()
+    return 
+
+def update_user_info():
+
+def change_own_info():
+    view_users()
+    user = input("What is the user id of employee to ipdate?: ")         
+    query = """UPDATE Users
+               SET ?,?,?,?,?
+               WHERE user_id = ?"""
+
+    fields = ['first_name',
+              'last_name',
+              'phone',
+              'email',
+              'password',
+              ]
+    values = []
+
+    for field in fields:
+        values.append(input(f"{field}: "))
+
+    first_name =values[0]
+    last_name = values[1]
+    phone = values[2]
+    email = values[3]
+    password = values[4]
+    update = Users(first_name, last_name, phone, email, password)
+    update.update()
