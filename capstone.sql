@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS Competencies(
 CREATE TABLE IF NOT EXISTS Assessment_Results(
     result_id PRIMARY KEY INTEGER AUTOINCREMENT
     user_id INTEGER,
-    score TEXT,
+    score  DEFAULT 0,
     date_taken TEXT,
     manager_id INTEGER,
     ass_id INTEGER, 
