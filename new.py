@@ -577,17 +577,17 @@ def view_all_users():
         "User Type",
     ]
     print(
-        #    person id     first name     last name      phone          email          active        date created     hire date      user type
-        f"{headers[0]:8}{headers[1]:13}{headers[2]:14}{headers[3]:12}{headers[4]:20}{headers[5]:8}{headers[6]:14}{headers[7]:14}{headers[8]:8}"
+        #    user id      first name     last name      phone          email          active        date created     hire date      user type
+        f"{headers[0]:10}{headers[1]:13}{headers[2]:14}{headers[3]:14}{headers[4]:20}{headers[5]:8}{headers[6]:14}{headers[7]:14}{headers[8]:8}"
     )
     print(
-        f'{"-------":8}{"-----------":13}{"----------":14}{"------------":12}{"--------------------":20}{"---------------":8}{"--------":14}{"-----------":14}{"------":8}'
+        f'{"--------":10}{"-----------":13}{"------------":14}{"------------":14}{"------------------":20}{"------":8}{"------------":14}{"------------":14}{"---------":8}'
     )
 
     for row in active:
         row = [str(i) for i in row]
         print(
-            f"{row[0]:<8}{row[1]:<13}{row[2]:<14}{row[3]:<12}{row[4]:<20}{row[5]:<8}{row[6]:<14}{row[7]:<14}{row[8]:<8}"
+            f"{row[0]:<10}{row[1]:<13}{row[2]:<14}{row[3]:<14}{row[4]:<20}{row[5]:<8}{row[6]:<14}{row[7]:<14}{row[8]:<8}"
         )
 
     return
@@ -741,18 +741,31 @@ def user_comp_summary():
 
 
 def add_user():
-    f_name = print(input("First Name: "))
-    l_name = print(input("Last Name: "))
-    phone = print(input("Phone: "))
-    email = print(input("Email: "))
+    f_name = input("First Name: ")
+    l_name = input("Last Name: ")
+    phone = input("Phone: ")
+    email = input("Email: ")
     # password = print(input("password: ")) <--DEFAULT INSERT (make them change on first login)
-    hire_date = print(input("Hire Date: "))
-    type = print(input("User Type: "))
-    add = """INSERT INTO Users (first_name, last_name, phone, email, hire_date, user_type )
-             VALUES (?,?,?,?,?,?);"""
+    hire_date = input("Hire Date: ")
+    user_type = input("User Type: ")
+    now = datetime.now()
+    date_created = now.strftime("%Y/%m/%d")
+    # date_created = datetime().now.strftime("%Y/%m/%d")
+    # This query works directly:
+    # INSERT INTO Users (first_name,last_name,phone,email,date_created) VALUES ("John","Ipson","5555555555","john@john.com","Today")
+    add = "INSERT INTO Users (first_name,last_name,phone,email,date_created,hire_date,user_type) VALUES (?,?,?,?,?,?,?);"
     # val = f_name, l_name, phone, email, hire_date, type
-    cursor.execute(add, (f_name, l_name, phone, email, hire_date, type))
+    cursor.execute(
+        add, (f_name, l_name, phone, email, date_created, hire_date, user_type)
+    )
     connection.commit()
+
+
+def import_csv_users():
+    with open("users.csv", "rt") as users_csv:
+        reader = csv.reader()
+
+        header = reader.r
 
 
 # def add_user(user):
@@ -791,7 +804,7 @@ def add_new_comp():
 def add_new_ass():
     view_all_comps()
     id = input("What is the id of the competency for this assessment?: ")
-    date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    date = datetime.now().strftime("%Y-%m-%d")
 
     add = """INSERT INTO Assessment_Data (comp_id, date_created)
              VALUES (?,?)"""
@@ -802,7 +815,7 @@ def add_new_ass():
 def add_new_assr():
     user_id = input("User ID: ")
     score = input("Score: ")
-    date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    date = datetime.now().strftime("%Y-%m-%d")
     manager = input("Manager ID: ")
     ass_id = input("Assessment ID: ")
     add = """INSERT INTO Assessment_Results (user_id, score, date_taken, manager_id, ass_id)
